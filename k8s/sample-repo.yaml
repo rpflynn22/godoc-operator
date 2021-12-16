@@ -1,0 +1,9 @@
+apiVersion: godoc.rpflynn22.io/v1alpha1
+kind: Repo
+metadata:
+  name: test2
+spec:
+  repo: github.com/spf13/cobra
+  githubPATSecret:
+    name: github
+    key: pat

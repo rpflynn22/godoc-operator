@@ -1,0 +1,86 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: godoc-operator
+  namespace: godoc
+  labels:
+    app: godoc-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: godoc-operator
+  template:
+    metadata:
+      labels:
+        app: godoc-operator
+    spec:
+      containers:
+      - name: godoc-operator
+        image: rpflynn22/godoc-operator:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+      serviceAccountName: godoc-operator
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: godoc-operator
+  namespace: godoc
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: godoc-operator
+rules:
+- apiGroups:
+  - "apps"
+  resources:
+  - "deployments"
+  verbs:
+  - "get"
+  - "list"
+  - "watch"
+  - "create"
+  - "update"
+  - "patch"
+  - "delete"
+- apiGroups:
+  - "godoc.rpflynn22.io"
+  resources:
+  - "repos"
+  verbs:
+  - "get"
+  - "list"
+  - "watch"
+  - "create"
+  - "update"
+  - "patch"
+  - "delete"
+- apiGroups:
+  - ""
+  resources:
+  - "services"
+  verbs:
+  - "get"
+  - "list"
+  - "watch"
+  - "create"
+  - "update"
+  - "patch"
+  - "delete"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: godoc-operator
+subjects:
+- kind: ServiceAccount
+  name: godoc-operator
+  namespace: godoc
+roleRef:
+  kind: ClusterRole
+  name: godoc-operator
+  apiGroup: rbac.authorization.k8s.io
