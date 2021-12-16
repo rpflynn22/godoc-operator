@@ -13,10 +13,10 @@ docker-build: build
 		-t rpflynn22/godoc-server:latest \
 		-f docker/godoc-server/Dockerfile .
 
-deploy: docker-build
+deploy: docker-build create-crd
 	kubectl -n godoc apply -f k8s/godoc-operator.yaml
 
-undeploy:
+undeploy: delete-crd
 	kubectl -n godoc delete -f k8s/godoc-operator.yaml
 
 create-crd:
