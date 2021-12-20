@@ -1,7 +1,12 @@
 # Godoc Operator
 
-A Kubernetes controller/operator that deploys godoc servers for private
-Github repos.
+This repository contains a Kubernetes operator that deploys
+[Godoc servers](https://pkg.go.dev/golang.org/x/tools/cmd/godoc) to a k8s
+cluster and sets up Services and Ingresses to access them. pkg.go.dev already
+does this (with a better UI), but it cannot generate documentation for private
+repositories on Github. By using this operator, you can write a few lines of
+yaml and deploy a godoc server that _can_ access your private repos and serve
+documentation for them.
 
 ## Use it
 
@@ -11,14 +16,16 @@ already setup to not pull remote images.
 
 Run
 ```sh
-$ kubectl create ns godoc
 $ make deploy
 ```
 to deploy everything. It
 - builds the operator docker image
 - builds the godoc server docker image
-- deploys the operator along with rbac permissions it needs
+- creates a `godoc` namespace where everything is placed
 - deploys the CRD
+- deploys the operator along with rbac permissions it needs
+- creates a Secret containing your Github PAT; uses the environment variable
+`$PERSONAL_GITHUB_TOKEN`
 
 To see it work, run
 
@@ -27,10 +34,5 @@ $ kubectl -n godoc apply -f k8s/sample-repo.yaml
 ```
 
 Note that this won't work for you as the sample references _my_ private repo.
-You'll need to change the repo to a URL you have access to (public or private)
-and create a Secret containing the PAT that can be used to access the repo.
+You'll need to change the repo to a URL you have access to (public or private).
 
-## Current State
-
-It only creates missing things right now. It does not deal with spec drift or
-deletion.

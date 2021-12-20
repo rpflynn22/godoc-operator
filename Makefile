@@ -13,11 +13,14 @@ docker-build: build
 		-t rpflynn22/godoc-server:latest \
 		-f docker/godoc-server/Dockerfile .
 
-deploy: docker-build create-crd
+deploy: docker-build deploy-ns create-crd create-secret
 	kubectl -n godoc apply -f k8s/godoc-operator.yaml
 
-undeploy: delete-crd
+undeploy: delete-crd delete-secret
 	kubectl -n godoc delete -f k8s/godoc-operator.yaml
+
+deploy-ns:
+	kubectl apply -f k8s/namespace.yaml
 
 create-crd:
 	kubectl apply -f k8s/crd.yaml
@@ -33,3 +36,6 @@ install-controller-gen:
 
 create-secret:
 	kubectl -n godoc create secret generic github --from-literal=pat=$(PERSONAL_GITHUB_TOKEN)
+
+delete-secret:
+	kubectl -n godoc delete secret github

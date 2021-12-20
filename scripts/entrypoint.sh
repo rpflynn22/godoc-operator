@@ -25,7 +25,8 @@ trap '{ kill $godoc_pid; exit 0; }' INT TERM
 cd $full_path
 
 while /bin/true; do
-	sleep $(($REFRESH_INTERVAL_SECONDS + 1))
+	sleep $(($REFRESH_INTERVAL_SECONDS + 1)) &
+	wait $!
 	git fetch origin >/dev/null 2>&1
 	git reset --hard origin/${GIT_DEFAULT_BRANCH} >/dev/null 2>&1
 done
