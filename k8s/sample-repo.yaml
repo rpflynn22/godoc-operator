@@ -4,6 +4,7 @@ metadata:
   name: test2
 spec:
   repo: github.com/spf13/cobra
+  dnsParent: "godoc.example.com"
   githubPATSecret:
     name: github
     key: pat

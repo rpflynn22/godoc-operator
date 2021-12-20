@@ -18,6 +18,10 @@ spec:
               properties:
                 repo:
                   type: string
+                dnsParent:
+                  type: string
+                albSecurityGroup:
+                  type: string
                 githubPATSecret:
                   type: object
                   properties:

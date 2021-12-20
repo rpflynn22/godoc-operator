@@ -6,8 +6,10 @@ import (
 
 // RepoSpec defines the desired state of Repo
 type RepoSpec struct {
-	Repo            string          `json:"repo"`
-	GithubPATSecret GithubPATSecret `json:"githubPATSecret"`
+	Repo             string          `json:"repo"`
+	GithubPATSecret  GithubPATSecret `json:"githubPATSecret"`
+	DNSParent        string          `json:"dnsParent"`
+	ALBSecurityGroup string          `json:"albSecurityGroup"`
 }
 
 type GithubPATSecret struct {

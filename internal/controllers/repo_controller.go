@@ -5,16 +5,16 @@ import (
 
 	appsApi "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	netApi "k8s.io/api/networking/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
 	godocApi "github.com/rpflynn22/godoc-operator/internal/api/v1alpha1"
-	managed "github.com/rpflynn22/godoc-operator/internal/managed"
+	"github.com/rpflynn22/godoc-operator/internal/managed"
 )
 
 // RepoReconciler reconciles a Repo object
@@ -33,70 +33,42 @@ func (r *RepoReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 
 	repo := godocApi.Repo{}
 	if err := r.Get(ctx, req.NamespacedName, &repo); err != nil {
-		logger.Error(err, "get object")
+		if client.IgnoreNotFound(err) != nil {
+			logger.Error(err, "get object")
+		} else {
+			logger.Info("resource not found, delete likely")
+		}
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	if isBeingDeleted(&repo) {
-		logger.Info("being deleted")
-		// delete dependent resources, okay if missing
-		// remove finalizer & update
-		return ctrl.Result{}, nil
-	}
-
-	// add finalizer if not exists
-
-	// create dependent objects in mem
-	//   set ownership reference for each dependent object
-	deployment := managed.Deployment(&repo)
-	if err := controllerutil.SetControllerReference(&repo, deployment, r.Scheme); err != nil {
-		logger.Error(err, "deployment set controller reference")
-		return ctrl.Result{}, nil
-	}
-
-	service := managed.Service(&repo)
-	if err := controllerutil.SetControllerReference(&repo, service, r.Scheme); err != nil {
-		logger.Error(err, "service set controller reference")
-		return ctrl.Result{}, nil
-	}
-
-	// look for existing dependent objects
-	//   create them if they don't exist
-	//   update them if they're misconfigured
-	var existingDeployment appsApi.Deployment
-	err := r.Get(ctx, types.NamespacedName{
-		Namespace: req.Namespace,
-		Name:      req.Name,
-	}, &existingDeployment)
-
+	deploy := &appsApi.Deployment{ObjectMeta: metav1.ObjectMeta{Name: managed.ResourceName(req.Name), Namespace: req.Namespace}}
+	result, err := controllerutil.CreateOrUpdate(ctx, r.Client, deploy, func() error {
+		managed.UpdateDeployment(&repo, deploy)
+		return controllerutil.SetControllerReference(&repo, deploy, r.Scheme)
+	})
 	if err != nil {
-		if apierrors.IsNotFound(err) {
-			if err := r.Create(ctx, deployment); err != nil && !apierrors.IsAlreadyExists(err) {
-				logger.Error(err, "create deployment")
-				return ctrl.Result{}, err
-			}
-		} else {
-			logger.Error(err, "get existing deployment")
-			return ctrl.Result{}, err
-		}
+		logger.Error(err, "create update deploy", "result", result)
+		return ctrl.Result{}, err
 	}
 
-	var existingService v1.Service
-	err = r.Get(ctx, types.NamespacedName{
-		Namespace: req.Namespace,
-		Name:      req.Name,
-	}, &existingService)
-
+	service := &v1.Service{ObjectMeta: metav1.ObjectMeta{Name: managed.ResourceName(req.Name), Namespace: req.Namespace}}
+	result, err = controllerutil.CreateOrUpdate(ctx, r.Client, service, func() error {
+		managed.UpdateService(&repo, service)
+		return controllerutil.SetControllerReference(&repo, service, r.Scheme)
+	})
 	if err != nil {
-		if apierrors.IsNotFound(err) {
-			if err := r.Create(ctx, service); err != nil && !apierrors.IsAlreadyExists(err) {
-				logger.Error(err, "create service")
-				return ctrl.Result{}, err
-			}
-		} else {
-			logger.Error(err, "get existing service")
-			return ctrl.Result{}, err
-		}
+		logger.Error(err, "create update service", "result", result)
+		return ctrl.Result{}, err
+	}
+
+	ingress := &netApi.Ingress{ObjectMeta: metav1.ObjectMeta{Name: managed.ResourceName(req.Name), Namespace: req.Namespace}}
+	result, err = controllerutil.CreateOrUpdate(ctx, r.Client, ingress, func() error {
+		managed.UpdateIngress(&repo, ingress)
+		return controllerutil.SetControllerReference(&repo, ingress, r.Scheme)
+	})
+	if err != nil {
+		logger.Error(err, "create update ingress", "result", result)
+		return ctrl.Result{}, err
 	}
 
 	return ctrl.Result{}, nil
@@ -108,9 +80,6 @@ func (r *RepoReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&godocApi.Repo{}).
 		Owns(&appsApi.Deployment{}).
 		Owns(&v1.Service{}).
+		Owns(&netApi.Ingress{}).
 		Complete(r)
-}
-
-func isBeingDeleted(repo *godocApi.Repo) bool {
-	return !repo.GetDeletionTimestamp().IsZero()
 }

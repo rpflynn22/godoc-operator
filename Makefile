@@ -30,3 +30,6 @@ generate: install-controller-gen
 
 install-controller-gen:
 	which controller-gen || go install sigs.k8s.io/controller-tools/cmd/controller-gen@latest
+
+create-secret:
+	kubectl -n godoc create secret generic github --from-literal=pat=$(PERSONAL_GITHUB_TOKEN)

@@ -20,7 +20,7 @@ git clone https://$GH_PAT@$GO_REPO $full_path >/dev/null 2>&1
 
 godoc -index_interval ${REFRESH_INTERVAL_SECONDS}s -http :${GODOC_PORT} -goroot /go &
 godoc_pid=$!
-trap "kill $godoc_pid; exit" INT TERM
+trap '{ kill $godoc_pid; exit 0; }' INT TERM
 
 cd $full_path
 
