@@ -10,22 +10,15 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/scheme"
 
-	godocv1alpha1 "github.com/rpflynn22/godoc-operator/internal/api/v1alpha1"
+	godocApi "github.com/rpflynn22/godoc-operator/internal/api/v1alpha1"
 	"github.com/rpflynn22/godoc-operator/internal/controllers"
 )
 
-var (
-	scheme   = runtime.NewScheme()
-	setupLog = ctrl.Log.WithName("setup")
-)
-
-func init() {
-	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
-	utilruntime.Must(godocv1alpha1.AddToScheme(scheme))
-}
-
 func main() {
+	setupLog := ctrl.Log.WithName("setup")
+
 	opts := zap.Options{
 		Development: true,
 	}
@@ -34,8 +27,10 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
+	rtScheme := setupScheme()
+
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme: scheme,
+		Scheme: rtScheme,
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -55,4 +50,13 @@ func main() {
 		setupLog.Error(err, "problem running manager")
 		os.Exit(1)
 	}
+}
+
+func setupScheme() *runtime.Scheme {
+	rtScheme := runtime.NewScheme()
+	schemeBuilder := &scheme.Builder{GroupVersion: godocApi.GroupVersion}
+	schemeBuilder.Register(&godocApi.Repo{}, &godocApi.RepoList{})
+	utilruntime.Must(clientgoscheme.AddToScheme(rtScheme))
+	utilruntime.Must(schemeBuilder.AddToScheme(rtScheme))
+	return rtScheme
 }
