@@ -15,19 +15,45 @@ spec:
           properties:
             spec:
               type: object
+              required:
+              - goConfig
+              - githubCredentials
               properties:
-                repo:
-                  type: string
-                dnsParent:
-                  type: string
-                albSecurityGroup:
-                  type: string
-                githubPATSecret:
+                goConfig:
+                  type: object
+                  required:
+                  - repo
+                  properties:
+                    repo:
+                      type: string
+                    goPrivatePattern:
+                      type: string
+                    moduleVersion:
+                      type: string
+                githubCredentials:
+                  type: object
+                  required:
+                  - username
+                  - personalAccessTokenSecret
+                  properties:
+                    username:
+                      type: string
+                    personalAccessTokenSecret:
+                      type: object
+                      required:
+                      - name
+                      - key
+                      properties:
+                        name:
+                          type: string
+                        key:
+                          type: string
+                albConfig:
                   type: object
                   properties:
-                    name:
+                    dnsParent:
                       type: string
-                    key:
+                    securityGroup:
                       type: string
             status:
               type: object

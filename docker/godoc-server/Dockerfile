@@ -1,4 +1,4 @@
-FROM golang:1.17 as godoc
+FROM golang:1.16 as godoc
 
 WORKDIR /
 

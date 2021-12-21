@@ -5,7 +5,6 @@ import (
 
 	appsApi "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	netApi "k8s.io/api/networking/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
@@ -47,7 +46,7 @@ func (r *RepoReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return controllerutil.SetControllerReference(&repo, deploy, r.Scheme)
 	})
 	if err != nil {
-		logger.Error(err, "create update deploy", "result", result)
+		logger.Error(err, "create/update deploy", "result", result)
 		return ctrl.Result{}, err
 	}
 
@@ -57,17 +56,7 @@ func (r *RepoReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.
 		return controllerutil.SetControllerReference(&repo, service, r.Scheme)
 	})
 	if err != nil {
-		logger.Error(err, "create update service", "result", result)
-		return ctrl.Result{}, err
-	}
-
-	ingress := &netApi.Ingress{ObjectMeta: metav1.ObjectMeta{Name: managed.ResourceName(req.Name), Namespace: req.Namespace}}
-	result, err = controllerutil.CreateOrUpdate(ctx, r.Client, ingress, func() error {
-		managed.UpdateIngress(&repo, ingress)
-		return controllerutil.SetControllerReference(&repo, ingress, r.Scheme)
-	})
-	if err != nil {
-		logger.Error(err, "create update ingress", "result", result)
+		logger.Error(err, "create/update service", "result", result)
 		return ctrl.Result{}, err
 	}
 
@@ -80,6 +69,5 @@ func (r *RepoReconciler) SetupWithManager(mgr ctrl.Manager) error {
 		For(&godocApi.Repo{}).
 		Owns(&appsApi.Deployment{}).
 		Owns(&v1.Service{}).
-		Owns(&netApi.Ingress{}).
 		Complete(r)
 }

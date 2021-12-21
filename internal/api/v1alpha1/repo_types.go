@@ -6,10 +6,25 @@ import (
 
 // RepoSpec defines the desired state of Repo
 type RepoSpec struct {
-	Repo             string          `json:"repo"`
-	GithubPATSecret  GithubPATSecret `json:"githubPATSecret"`
-	DNSParent        string          `json:"dnsParent"`
-	ALBSecurityGroup string          `json:"albSecurityGroup"`
+	GoConfig  GoConfig           `json:"goConfig"`
+	GHCreds   GithubCredentials  `json:"githubCredentials"`
+	ALBConfig LoadBalancerConfig `json:"albConfig"`
+}
+
+type GoConfig struct {
+	Repo          string `json:"repo"`
+	GoPrivate     string `json:"goPrivatePattern"`
+	ModuleVersion string `json:"moduleVersion"`
+}
+
+type LoadBalancerConfig struct {
+	DNSParent string `json:"dnsParent"`
+	AlbSg     string `json:"securityGroup"`
+}
+
+type GithubCredentials struct {
+	Username  string          `json:"username"`
+	PATSecret GithubPATSecret `json:"personalAccessTokenSecret"`
 }
 
 type GithubPATSecret struct {

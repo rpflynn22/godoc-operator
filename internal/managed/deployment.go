@@ -8,27 +8,27 @@ import (
 	godocApi "github.com/rpflynn22/godoc-operator/internal/api/v1alpha1"
 )
 
-func UpdateDeployment(godoc *godocApi.Repo, deployment *appsApi.Deployment) {
+func UpdateDeployment(repo *godocApi.Repo, deployment *appsApi.Deployment) {
 	if deployment.ObjectMeta.Labels == nil {
 		deployment.ObjectMeta.Labels = make(map[string]string)
 	}
-	for k, v := range ResourceLabels(godoc, deploymentComponent) {
+	for k, v := range ResourceLabels(repo, deploymentComponent) {
 		deployment.ObjectMeta.Labels[k] = v
 	}
 	deployment.Spec = appsApi.DeploymentSpec{
 		Replicas: intP(2),
 		Selector: &metav1.LabelSelector{
-			MatchLabels: ResourceLabels(godoc, podComponent),
+			MatchLabels: ResourceLabels(repo, podComponent),
 		},
 		Template: v1.PodTemplateSpec{
 			ObjectMeta: metav1.ObjectMeta{
-				GenerateName: ResourceName(godoc.Name), // name todo
-				Labels:       ResourceLabels(godoc, podComponent),
+				GenerateName: ResourceName(repo.Name),
+				Labels:       ResourceLabels(repo, podComponent),
 			},
 			Spec: v1.PodSpec{
 				Containers: []v1.Container{
 					{
-						Name:            ResourceName(godoc.Name),
+						Name:            ResourceName(repo.Name),
 						Image:           "rpflynn22/godoc-server:latest",
 						ImagePullPolicy: v1.PullNever,
 						Ports: []v1.ContainerPort{
@@ -39,16 +39,20 @@ func UpdateDeployment(godoc *godocApi.Repo, deployment *appsApi.Deployment) {
 						Env: []v1.EnvVar{
 							{
 								Name:  "GO_REPO",
-								Value: godoc.Spec.Repo,
+								Value: repo.Spec.GoConfig.Repo,
+							},
+							{
+								Name:  "GH_USER",
+								Value: repo.Spec.GHCreds.Username,
 							},
 							{
 								Name: "GH_PAT",
 								ValueFrom: &v1.EnvVarSource{
 									SecretKeyRef: &v1.SecretKeySelector{
 										LocalObjectReference: v1.LocalObjectReference{
-											Name: godoc.Spec.GithubPATSecret.Name,
+											Name: repo.Spec.GHCreds.PATSecret.Name,
 										},
-										Key: godoc.Spec.GithubPATSecret.Key,
+										Key: repo.Spec.GHCreds.PATSecret.Key,
 									},
 								},
 							},
@@ -57,6 +61,24 @@ func UpdateDeployment(godoc *godocApi.Repo, deployment *appsApi.Deployment) {
 				},
 			},
 		},
+	}
+	if repo.Spec.GoConfig.GoPrivate != "" {
+		deployment.Spec.Template.Spec.Containers[0].Env = append(
+			deployment.Spec.Template.Spec.Containers[0].Env,
+			v1.EnvVar{
+				Name:  "GOPRIVATE_PATTERN",
+				Value: repo.Spec.GoConfig.GoPrivate,
+			},
+		)
+	}
+	if repo.Spec.GoConfig.ModuleVersion != "" {
+		deployment.Spec.Template.Spec.Containers[0].Env = append(
+			deployment.Spec.Template.Spec.Containers[0].Env,
+			v1.EnvVar{
+				Name:  "MOD_VERSION",
+				Value: repo.Spec.GoConfig.ModuleVersion,
+			},
+		)
 	}
 }
 

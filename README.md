@@ -2,7 +2,7 @@
 
 This repository contains a Kubernetes operator that deploys
 [Godoc servers](https://pkg.go.dev/golang.org/x/tools/cmd/godoc) to a k8s
-cluster and sets up Services and Ingresses to access them. pkg.go.dev already
+cluster and sets up Services to access them. pkg.go.dev already
 does this (with a better UI), but it cannot generate documentation for private
 repositories on Github. By using this operator, you can write a few lines of
 yaml and deploy a godoc server that _can_ access your private repos and serve

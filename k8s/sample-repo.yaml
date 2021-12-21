@@ -1,10 +1,15 @@
 apiVersion: godoc.rpflynn22.io/v1alpha1
 kind: Repo
 metadata:
-  name: test2
+  name: test
 spec:
-  repo: github.com/spf13/cobra
-  dnsParent: "godoc.example.com"
-  githubPATSecret:
-    name: github
-    key: pat
+  goConfig:
+    repo: github.com/rpflynn22/private-test-0
+  githubCredentials:
+    username: rpflynn22
+    personalAccessTokenSecret:
+      name: github
+      key: pat
+  albConfig:
+    dnsParent: "godoc.example.com"
+    securityGroup: "sg-test"
