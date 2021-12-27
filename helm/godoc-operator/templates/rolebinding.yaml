@@ -1,0 +1,19 @@
+apiVersion: rbac.authorization.k8s.io/v1
+{{- if .Values.operator.watch.clusterScope }}
+kind: ClusterRoleBinding
+{{- else }}
+kind: RoleBinding
+{{- end }}
+metadata:
+  name: {{ include "godoc-operator.fullname" . }}
+{{- if not .Values.operator.watch.clusterScope }}
+  namespace: {{ .Values.operator.watch.namespace }}
+{{- end }}
+subjects:
+- kind: ServiceAccount
+  name: {{ include "godoc-operator.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+roleRef:
+  kind: ClusterRole
+  name: {{ include "godoc-operator.fullname" . }}
+  apiGroup: rbac.authorization.k8s.io
