@@ -48,13 +48,15 @@ spec:
                           type: string
                         key:
                           type: string
-                albConfig:
+                awsAlbConfig:
                   type: object
+                  required:
+                  - securityGroup
                   properties:
-                    dnsParent:
-                      type: string
                     securityGroup:
                       type: string
+                dnsParent:
+                  type: string
             status:
               type: object
               properties:

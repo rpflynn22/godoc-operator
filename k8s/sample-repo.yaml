@@ -10,6 +10,6 @@ spec:
     personalAccessTokenSecret:
       name: github
       key: pat
-  albConfig:
-    dnsParent: "godoc.example.com"
-    securityGroup: "sg-test"
+  dnsParent: "godoc.example.com"
+  awsAlbConfig:
+    securityGroup: "testsg"

@@ -1,0 +1,7 @@
+image:
+  pullPolicy: Never
+
+operator:
+  watch:
+    namespace: godoc
+

@@ -1,8 +1,6 @@
 package managed
 
 import (
-	"fmt"
-
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 
@@ -19,9 +17,6 @@ func UpdateService(repo *godocApi.Repo, service *v1.Service) {
 	if service.ObjectMeta.Annotations == nil {
 		service.ObjectMeta.Annotations = make(map[string]string)
 	}
-	for k, v := range svcAnnotations(repo) {
-		service.ObjectMeta.Annotations[k] = v
-	}
 
 	service.Spec = v1.ServiceSpec{
 		Selector: ResourceLabels(repo, podComponent),
@@ -33,20 +28,4 @@ func UpdateService(repo *godocApi.Repo, service *v1.Service) {
 			},
 		},
 	}
-}
-
-func svcAnnotations(repo *godocApi.Repo) map[string]string {
-	return map[string]string{
-		"alb.ingress.kubernetes.io/backend-protocol": "HTTP",
-		"alb.ingress.kubernetes.io/listen-ports":     "[{\"HTTP\":80}]",
-		"alb.ingress.kubernetes.io/scheme":           "internal",
-		"alb.ingress.kubernetes.io/security-groups":  repo.Spec.ALBConfig.AlbSg,
-		"alb.ingress.kubernetes.io/target-type":      "ip",
-		"external-dns.alpha.kubernetes.io/hostname":  dnsHostname(repo),
-		"kubernetes.io/ingress.class":                "alb",
-	}
-}
-
-func dnsHostname(repo *godocApi.Repo) string {
-	return fmt.Sprintf("%s.%s", repo.GetName(), repo.Spec.ALBConfig.DNSParent)
 }

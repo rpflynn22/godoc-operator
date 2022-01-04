@@ -30,7 +30,7 @@ func UpdateDeployment(repo *godocApi.Repo, deployment *appsApi.Deployment) {
 					{
 						Name:            ResourceName(repo.Name),
 						Image:           "rpflynn22/godoc-server:latest",
-						ImagePullPolicy: v1.PullNever,
+						ImagePullPolicy: v1.PullNever, // todo: change with real images
 						Ports: []v1.ContainerPort{
 							{
 								ContainerPort: 6060,

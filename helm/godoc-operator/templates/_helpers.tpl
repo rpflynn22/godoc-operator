@@ -53,3 +53,11 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "godoc-operator.command" -}}
+{{- if and (not .Values.operator.watch.clusterScope) .Values.operator.watch.namespace -}}
+args:
+- "--namespace"
+- {{ .Values.operator.watch.namespace }}
+{{- end }}
+{{- end }}

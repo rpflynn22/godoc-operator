@@ -10,6 +10,7 @@ const (
 	deploymentComponent = "deployment"
 	podComponent        = "pod"
 	serviceComponent    = "service"
+	ingressComponent    = "ingress"
 )
 
 func ResourceName(repoResourceName string) string {

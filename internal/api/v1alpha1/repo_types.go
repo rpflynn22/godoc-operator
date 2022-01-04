@@ -6,20 +6,16 @@ import (
 
 // RepoSpec defines the desired state of Repo
 type RepoSpec struct {
-	GoConfig  GoConfig           `json:"goConfig"`
-	GHCreds   GithubCredentials  `json:"githubCredentials"`
-	ALBConfig LoadBalancerConfig `json:"albConfig"`
+	GoConfig     GoConfig          `json:"goConfig"`
+	GHCreds      GithubCredentials `json:"githubCredentials"`
+	DNSParent    string            `json:"dnsParent"`
+	AWSAlbConfig *AWSAlbConfig     `json:"awsAlbConfig"`
 }
 
 type GoConfig struct {
 	Repo          string `json:"repo"`
 	GoPrivate     string `json:"goPrivatePattern"`
 	ModuleVersion string `json:"moduleVersion"`
-}
-
-type LoadBalancerConfig struct {
-	DNSParent string `json:"dnsParent"`
-	AlbSg     string `json:"securityGroup"`
 }
 
 type GithubCredentials struct {
@@ -30,6 +26,10 @@ type GithubCredentials struct {
 type GithubPATSecret struct {
 	Name string `json:"name"`
 	Key  string `json:"key"`
+}
+
+type AWSAlbConfig struct {
+	SecurityGroup string `json:"securityGroup"`
 }
 
 //+kubebuilder:subresource:status

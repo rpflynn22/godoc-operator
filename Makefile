@@ -6,27 +6,15 @@ clean:
 
 docker-build: build
 	docker build \
-		-t rpflynn22/godoc-operator:latest \
+		-t rpflynn22/godoc-operator:0.0.1 \
 		--build-arg BIN=./bin/godoc-operator \
 		-f docker/godoc-operator/Dockerfile .
 	docker build \
 		-t rpflynn22/godoc-server:latest \
 		-f docker/godoc-server/Dockerfile .
 
-deploy: docker-build deploy-ns create-crd create-secret
-	kubectl -n godoc apply -f k8s/godoc-operator.yaml
-
-undeploy: delete-crd delete-secret
-	kubectl -n godoc delete -f k8s/godoc-operator.yaml
-
-deploy-ns:
-	kubectl apply -f k8s/namespace.yaml
-
-create-crd:
-	kubectl apply -f k8s/crd.yaml
-
 delete-crd:
-	kubectl delete -f k8s/crd.yaml
+	kubectl delete -f helm/godoc-operator/crds/repo.yaml
 
 generate: install-controller-gen
 	controller-gen object paths=./internal/api/...
@@ -39,3 +27,12 @@ create-secret:
 
 delete-secret:
 	kubectl -n godoc delete secret github
+
+helm-template:
+	helm template -n godoc -f helm/minikube.yaml godoc ./helm/godoc-operator
+
+helm-install: docker-build create-secret
+	helm install -n godoc -f helm/minikube.yaml godoc ./helm/godoc-operator
+
+helm-uninstall: delete-secret
+	helm uninstall -n godoc godoc

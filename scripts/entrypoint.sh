@@ -48,8 +48,6 @@ godoc -index_interval ${REFRESH_INTERVAL_SECONDS}s -http :${GODOC_PORT} &
 godoc_pid=$!
 trap '{ kill $godoc_pid; exit 0; }' INT TERM
 
-cd $full_path
-
 while /bin/true; do
 	sleep $(($REFRESH_INTERVAL_SECONDS + 1)) &
 	wait $!

@@ -3,4 +3,4 @@ name: godoc-operator
 description: A helm chart for an operator that deploys godoc servers.
 type: application
 version: 0.0.1
-appVersion: "0.0.1"
+appVersion: 0.0.1
