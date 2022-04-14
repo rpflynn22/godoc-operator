@@ -32,15 +32,20 @@ func UpdateIngress(repo *godocApi.Repo, ingress *netApi.Ingress) {
 
 func ingAnnotations(repo *godocApi.Repo) map[string]string {
 	if repo.Spec.AWSAlbConfig != nil {
-		return map[string]string{
+		out := map[string]string{
 			"alb.ingress.kubernetes.io/backend-protocol": "HTTP",
-			"alb.ingress.kubernetes.io/listen-ports":     "'[{\"HTTP\":80}]'",
 			"alb.ingress.kubernetes.io/scheme":           "internal",
 			"alb.ingress.kubernetes.io/security-groups":  repo.Spec.AWSAlbConfig.SecurityGroup,
 			"alb.ingress.kubernetes.io/target-type":      "ip",
 			"external-dns.alpha.kubernetes.io/hostname":  ingHostname(repo),
 			"kubernetes.io/ingress.class":                "alb",
 		}
+		if repo.Spec.AWSAlbConfig.CertificateArn != "" {
+			out["alb.ingress.kubernetes.io/certificate-arn"] =
+				repo.Spec.AWSAlbConfig.CertificateArn
+			out["alb.ingress.kubernetes.io/listen-ports"] = "[{\"HTTPS\": 443}]"
+		}
+		return out
 	}
 	return make(map[string]string)
 }
@@ -56,7 +61,7 @@ func ingRule(repo *godocApi.Repo) netApi.IngressRule {
 			HTTP: &netApi.HTTPIngressRuleValue{
 				Paths: []netApi.HTTPIngressPath{
 					{
-						Path:     "/",
+						Path:     "/*",
 						PathType: ingPathTypeFix(),
 						Backend: netApi.IngressBackend{
 							Service: &netApi.IngressServiceBackend{

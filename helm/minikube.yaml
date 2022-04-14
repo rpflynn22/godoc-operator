@@ -1,7 +1,8 @@
-image:
-  pullPolicy: Never
-
 operator:
   watch:
     namespace: godoc
 
+image:
+  pullPolicy: Always
+  repository: rpflynn22/godoc-operator
+  tag: 0.0.3

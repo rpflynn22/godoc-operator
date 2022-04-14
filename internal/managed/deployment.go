@@ -29,8 +29,8 @@ func UpdateDeployment(repo *godocApi.Repo, deployment *appsApi.Deployment) {
 				Containers: []v1.Container{
 					{
 						Name:            ResourceName(repo.Name),
-						Image:           "rpflynn22/godoc-server:latest",
-						ImagePullPolicy: v1.PullNever, // todo: change with real images
+						Image:           "rpflynn22/godoc-server:0.0.4",
+						ImagePullPolicy: v1.PullAlways,
 						Ports: []v1.ContainerPort{
 							{
 								ContainerPort: 6060,
@@ -77,6 +77,15 @@ func UpdateDeployment(repo *godocApi.Repo, deployment *appsApi.Deployment) {
 			v1.EnvVar{
 				Name:  "MOD_VERSION",
 				Value: repo.Spec.GoConfig.ModuleVersion,
+			},
+		)
+	}
+	if repo.Spec.GoConfig.ImportPath != "" {
+		deployment.Spec.Template.Spec.Containers[0].Env = append(
+			deployment.Spec.Template.Spec.Containers[0].Env,
+			v1.EnvVar{
+				Name:  "IMPORT_PATH",
+				Value: repo.Spec.GoConfig.ImportPath,
 			},
 		)
 	}

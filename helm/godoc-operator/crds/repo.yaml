@@ -30,6 +30,8 @@ spec:
                       type: string
                     moduleVersion:
                       type: string
+                    importPath:
+                      type: string
                 githubCredentials:
                   type: object
                   required:
@@ -54,6 +56,8 @@ spec:
                   - securityGroup
                   properties:
                     securityGroup:
+                      type: string
+                    certificateArn:
                       type: string
                 dnsParent:
                   type: string

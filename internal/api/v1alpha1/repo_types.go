@@ -16,6 +16,7 @@ type GoConfig struct {
 	Repo          string `json:"repo"`
 	GoPrivate     string `json:"goPrivatePattern"`
 	ModuleVersion string `json:"moduleVersion"`
+	ImportPath    string `json:"importPath"`
 }
 
 type GithubCredentials struct {
@@ -29,7 +30,8 @@ type GithubPATSecret struct {
 }
 
 type AWSAlbConfig struct {
-	SecurityGroup string `json:"securityGroup"`
+	SecurityGroup  string `json:"securityGroup"`
+	CertificateArn string `json:"certificateArn,omitempty"`
 }
 
 //+kubebuilder:subresource:status

@@ -1,3 +1,5 @@
+DOCKER_USE_MK = eval $$(minikube docker-env 2>&1) &&
+
 build:
 	CGO_ENABLED=0 GOOS=linux go build -o ./bin/godoc-operator ./cmd/godoc-operator
 
@@ -6,11 +8,11 @@ clean:
 
 docker-build: build
 	docker build \
-		-t rpflynn22/godoc-operator:0.0.1 \
+		-t rpflynn22/godoc-operator:0.0.3 \
 		--build-arg BIN=./bin/godoc-operator \
-		-f docker/godoc-operator/Dockerfile .
+		-f docker/godoc-operator/Dockerfile . && \
 	docker build \
-		-t rpflynn22/godoc-server:latest \
+		-t rpflynn22/godoc-server:0.0.4\
 		-f docker/godoc-server/Dockerfile .
 
 delete-crd:
