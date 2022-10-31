@@ -7,12 +7,12 @@ clean:
 	rm -rf ./bin
 
 docker-build: build
-	docker build \
-		-t rpflynn22/godoc-operator:0.0.3 \
+	$(DOCKER_USE_MK) docker build \
+		-t rpflynn22/godoc-operator:0.0.4 \
 		--build-arg BIN=./bin/godoc-operator \
 		-f docker/godoc-operator/Dockerfile . && \
-	docker build \
-		-t rpflynn22/godoc-server:0.0.4\
+	$(DOCKER_USE_MK) docker build \
+		-t rpflynn22/godoc-server:0.0.4 \
 		-f docker/godoc-server/Dockerfile .
 
 delete-crd:

@@ -3,6 +3,6 @@ operator:
     namespace: godoc
 
 image:
-  pullPolicy: Always
+  pullPolicy: IfNotPresent
   repository: rpflynn22/godoc-operator
-  tag: 0.0.3
+  tag: 0.0.4

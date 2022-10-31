@@ -18,7 +18,6 @@ import (
 
 func main() {
 	setupLog := ctrl.Log.WithName("setup")
-	setupLog.Info("updated version")
 
 	namespace := flag.String("namespace", "", "operator watch ns")
 	flag.Parse()

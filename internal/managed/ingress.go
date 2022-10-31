@@ -37,6 +37,7 @@ func ingAnnotations(repo *godocApi.Repo) map[string]string {
 			"alb.ingress.kubernetes.io/scheme":           "internal",
 			"alb.ingress.kubernetes.io/security-groups":  repo.Spec.AWSAlbConfig.SecurityGroup,
 			"alb.ingress.kubernetes.io/target-type":      "ip",
+			"alb.ingress.kubernetes.io/success-codes":    "200-399",
 			"external-dns.alpha.kubernetes.io/hostname":  ingHostname(repo),
 			"kubernetes.io/ingress.class":                "alb",
 		}
