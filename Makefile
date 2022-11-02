@@ -1,4 +1,4 @@
-DOCKER_USE_MK = eval $$(minikube docker-env 2>&1) &&
+DOCKER_USE_MK ?= eval $$(minikube docker-env 2>&1) &&
 
 build:
 	CGO_ENABLED=0 GOOS=linux go build -o ./bin/godoc-operator ./cmd/godoc-operator
