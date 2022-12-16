@@ -3,9 +3,8 @@ package managed
 import (
 	"fmt"
 
-	netApi "k8s.io/api/networking/v1"
-
 	godocApi "github.com/rpflynn22/godoc-operator/internal/api/v1alpha1"
+	netApi "k8s.io/api/networking/v1"
 )
 
 func UpdateIngress(repo *godocApi.Repo, ingress *netApi.Ingress) {
@@ -80,6 +79,6 @@ func ingRule(repo *godocApi.Repo) netApi.IngressRule {
 }
 
 func ingPathTypeFix() *netApi.PathType {
-	result := netApi.PathTypePrefix
+	result := netApi.PathTypeImplementationSpecific
 	return &result
 }

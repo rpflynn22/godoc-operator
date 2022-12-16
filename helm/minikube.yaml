@@ -5,4 +5,4 @@ operator:
 image:
   pullPolicy: IfNotPresent
   repository: rpflynn22/godoc-operator
-  tag: 0.0.4
+  tag: 0.0.5

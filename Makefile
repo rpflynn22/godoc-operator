@@ -8,7 +8,7 @@ clean:
 
 docker-build: build
 	$(DOCKER_USE_MK) docker build \
-		-t rpflynn22/godoc-operator:0.0.4 \
+		-t rpflynn22/godoc-operator:0.0.5 \
 		--build-arg BIN=./bin/godoc-operator \
 		-f docker/godoc-operator/Dockerfile . && \
 	$(DOCKER_USE_MK) docker build \
